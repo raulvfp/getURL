@@ -1,0 +1,6 @@
+<solution>
+	<projects>
+		<project name="geturl.pjx" buildaction="0" recompile="false" displayerrors="true" regenerate="false" runafterbuild="false" outputfile="" />
+	</projects>
+	<versioncontrol class="" library="" convclass="BinaryToTextConversionFoxBin2PRG" convlibrary="ProjectExplorerEngine.vcx" convpath="E:\SHARED\THOR\Thor\Tools\Components\FoxBin2Prg\" repository="" includeinversioncontrol="0" autocommit="false" fileaddmessage="File added to project" fileremovemessage="File removed from project" cleanupmessage="Project cleanup" savedsolutionmessage="Solution settings changed" buildmessage="Built the project: version {Project.VersionNumber}" />
+</solution>

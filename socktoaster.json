@@ -1,0 +1,16 @@
+{
+    "name": "rauljrz/geturl",
+    "description": "Permite la conexion HTML y descargar paginas y archivos",
+    "authors": [
+		{
+			"name": "Raúl Juárez",
+			"email": "raul.jrz@gmail.com",
+			"homepage": "http://rauljrz.github.io/",
+			"role": "Developer"
+		}
+	],
+    "version": "2.1.0",
+    "require": {
+        "vfp": "^9.00",
+    }
+}
