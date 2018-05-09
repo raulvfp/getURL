@@ -1,4 +1,11 @@
-*.bak
-*.fxp
-*.log
+########## Visual Foxpro ##########
+# Created by socktoaster-ui
+#
+# Author: raul.jrz@gmail.com
+# Url: http://socktoaster.io
+##################################
+/*.bak
+/*.fxp
+/*.exe
+/*.log
 vfp9.lnk
