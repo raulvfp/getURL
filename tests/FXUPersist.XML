@@ -31,19 +31,19 @@
 	</xsd:schema>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>THIS.Top = 78</setting>
+		<setting>THIS.Top = 28</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>THIS.Left = 0</setting>
+		<setting>THIS.Left = 216</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>THIS.Height = IIF(VERSION(5)&gt;=900,650,480)</setting>
+		<setting>THIS.Height = IIF(VERSION(5)&gt;=900,666,480)</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>THIS.Width = IIF(VERSION(5)&gt;=900,884,803)</setting>
+		<setting>THIS.Width = IIF(VERSION(5)&gt;=900,1102,803)</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
@@ -159,7 +159,7 @@
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>THIS.grdTests.COLUMN2.Width = 631</setting>
+		<setting>THIS.grdTests.COLUMN2.Width = 849</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
@@ -167,7 +167,7 @@
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>
-		<setting>=SEEK("GETURL_TEST                                                                                                   TEST_GET                                                                                                                          ",THIS.icGridRS,"TCLName")</setting>
+		<setting>=SEEK("GETURL_TEST                                                                                                   TEST_GET_PRUEBA_DE_VERBOSE                                                                                                        ",THIS.icGridRS,"TCLName")</setting>
 	</foxunitpersist>
 	<foxunitpersist>
 		<userid>Admin</userid>

@@ -21,7 +21,7 @@ DEFINE CLASS getURL_test as FxuTestCase OF FxuTestCase.prg
 		SET PATH TO "E:\Shared\Project\librery\getURL\"
 		THIS.oldPath=SET('PATH')
 		THIS.oldProcedure=SET('PROCEDURE')
-		THIS.oldDefault=SET('DEFAULT')
+		THIS.oldDefault  =SET('DEFAULT')
 		*THIS.MessageOut('Procedures: '+SET("PROCEDURE"))
 		*THIS.MessageOut('Path......: '+SET("PATH"))
 		*THIS.MessageOut('Default...: '+SET("DEFAULT"))
@@ -48,6 +48,7 @@ DEFINE CLASS getURL_test as FxuTestCase OF FxuTestCase.prg
 	*--------------------------------------------------------------------
 	FUNCTION TearDown
 	*--------------------------------------------------------------------
+		THIS.oObject =""
 		SET PATH TO      (THIS.oldPath)
 		SET PROCEDURE TO (THIS.oldProcedure)
 		SET DEFAULT TO   (THIS.oldDefault)
@@ -64,18 +65,38 @@ DEFINE CLASS getURL_test as FxuTestCase OF FxuTestCase.prg
 		THIS.AssertEquals(lcExpectedValue, lcExpressResult,;
 						'Error, no devolvio el valor esperado')
 		THIS.MessageOut('Valor obtenido: '+lcExpressResult)
-	RETURN
-
-  ENDFUNC
+		RETURN
+	ENDFUNC
 
 	*--------------------------------------------------------------------
-	FUNCTION testNewTest
-		* 1. Change the name of the test to reflect its purpose. Test one thing only.
-		* 2. Implement the test by removing these comments and the default assertion and writing your own test code.
-	RETURN This.AssertNotImplemented()
+	FUNCTION test_get_Prueba_de_verbose
+	*--------------------------------------------------------------------
+		lcURLWebService= 'https://www.purgomalum.com/service/json?text=Prueba%20vfp9'
+		lcExpectedValue= '{"result":"Prueba vfp9"}'
 
-  ENDFUNC
+		THIS.oObject.verbose = .T.
+		lcExpressResult= THIS.oObject.get(lcURLWebService)
+		THIS.AssertEquals(lcExpectedValue, lcExpressResult,;
+						'Error, no devolvio el valor esperado')
+		THIS.MessageOut('Valor obtenido: '+lcExpressResult)
+		RETURN
+	ENDFUNC
 
+	*--------------------------------------------------------------------
+	FUNCTION test_get_ErrorControls
+	*--------------------------------------------------------------------
+		lcURLWebService = 'https://www.noexiste.com'
+		lcExpectedValue = ''
+
+		lcExpressResult = THIS.oObject.get(lcURLWebService)
+		THIS.MessageOut(REPLICATE('--',25))
+		THIS.MessageOut('Se consulta la URL: '+ lcURLWebService)
+		THIS.MessageOut('valor obtenido: '+ lcExpressResult)
+		THIS.AssertEquals(ALLTRIM(lcExpectedValue),;
+						 ALLTRIM(lcExpressResult),;
+							'Error, debe ser empty la repuesta')
+		RETURN
+	ENDFUNC
 
 ENDDEFINE
 *----------------------------------------------------------------------
