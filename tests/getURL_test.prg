@@ -10,10 +10,10 @@ DEFINE CLASS getURL_test as FxuTestCase OF FxuTestCase.prg
 	#IF .f.
 	LOCAL THIS AS getURL_test OF getURL_test.PRG
 	#ENDIF
-	oObject = ''  &&Este es el objecto que va a ser evaluado
-	oldPath = ''
+	oObject      = ''  &&Este es el objecto que va a ser evaluado
+	oldPath      = ''
 	oldProcedure = ''
-	oldDefault = ''
+	oldDefault   = ''
 
 	*--------------------------------------------------------------------
 	FUNCTION Setup
