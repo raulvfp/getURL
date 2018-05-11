@@ -10,20 +10,17 @@ Esta es una clase de VFP que permite la conexión a traves de HTTP, lo que habil
 **None! There is no dependency!**
 
 
-## Installation
-git clone 
+### Installation
+git clone https://github.com/raulvfp/getURL.git getURL
 
 
 ### Usage
 Metodo: 
-
 - get(lcURL) 
 	+ Parameters: La dirección web de la consulta.
 
-#### Example:
-
+### Example:
 `	lcURLWebService= 'https://www.purgomalum.com/service/json?text=Prueba%20vfp9'
-
 	oHTTP = CREATEOBJECT('geturl')
 	lcRequest = oHTTP.get(lcURLWebService)
 `
