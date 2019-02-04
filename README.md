@@ -21,9 +21,9 @@ Metodo:
 
 ## Example:
 
-`	
+```	
         lcURLWebService= "https://www.purgomalum.com/service/json?text=Prueba%20vfp9"
 
         oHTTP = CREATEOBJECT('geturl')
         lcRequest = oHTTP.get(lcURLWebService)
-`
+```
