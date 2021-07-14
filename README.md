@@ -22,8 +22,12 @@ Metodo:
 ## Example:
 
 ```	
-        lcURLWebService= "https://www.purgomalum.com/service/json?text=Prueba%20vfp9"
+        lcURLWebService= "https://api.openweathermap.org/data/2.5/weather?q=London&appid=d3c416949b580fae2a41d287f79aa144"
 
-        oHTTP = CREATEOBJECT('geturl')
-        lcRequest = oHTTP.get(lcURLWebService)
+        WITH NEWOBJECT('geturl','src\geturl.prg')
+                .Verbose = .T. &&Muestro estado del proceso por pantalla. (Default False)
+                .is_Log  = .T. &&Grabo los datos enviados, recibidos y errores en archivo. (Default True)
+        
+                lcResponse = .get(lcURLWebService)
+        ENDWITH
 ```

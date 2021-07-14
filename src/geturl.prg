@@ -1,151 +1,177 @@
 *
-*|--------------------------------------------------------------------------
+*-----------------------------------------------------------------------------------*
 *| getURL
-*|--------------------------------------------------------------------------
+*-----------------------------------------------------------------------------------*
 *|
 *| Archivo principal del sistema
 *| Author......: Raúl Jrz (raul.jrz@gmail.com) 
 *| Created.....: 08.05.2018 - 20:30
-*| Purpose.....: Conectarse con una direccion web
+*| Last Update.: 12.07.2021 - 20:00
+*| Purpose.....: Conectarse con una direccion web https, haciendo peticiones
+*|               GET, POST, DELETE, PUT ...
 *|
-*************************************************
+*-----------------------------------------------------------------------------------*
 **
 ** GETURL.PRG
 ** Returns the contains of any given URL
 **
-** Version: 1.0
-**
-** Author: Victor Espina (vespinas@cantv.net)
-**         Walter Valle (wvalle@develcomp.com)
-**         (based on original source code from Pablo Almunia)
-*
-** Date: August 20, 2003
+** Version: 2.0
 **
 **
-** Syntax:
-** cData = GetURL(pcURL[,plVerbose])
+** Syntax & Example:
+** 
+** WITH NEWOBJECT('geturl','src\geturl.prg')
+**		.Verbose = .T. &&Muestro estado del proceso por pantalla. (Default False)
+**      .is_Log  = .T. &&Grabo los datos enviados, recibidos y errores en archivo. (Default True)
+** 
+**      lcResponse = .get("https://api.openweathermap.org/data/2.5/weather?q=London&appid=d3c416949b580fae2a41d287f79aa144")
+** ENDWITH
 **
-** Where:
-** cData	 Contents (text or binary) of requested URL.
-** pcURL	 URL of the requested resource or file. If an
-**           error occurs, a empty string will be returned.
+** 
 **
-** Example:
-** cHTML=GetURL("http://www.portalfox.com")
-**
-**************************************************
+*-----------------------------------------------------------------------------------*
 *| Revisions...: v2.00
+*|  Modificado para acceder a servidores https y poder usar verbos POST, GET, PUT, DELETE ...
 *|
 */
 *-----------------------------------------------------------------------------------*
 DEFINE CLASS getURL AS Custom
 *
 *-----------------------------------------------------------------------------------*
-	bRelanzarThrow = .T. &&Relanza la excepcion al nivel superior
-	Verbose        = .F. &&If setted to TRUE, progress info will be shown.
-
+	Verbose= .F. &&If setted to TRUE, progress info will be shown.
+	is_log = .T. &&If setted to TRUE, records a log of the processes.
+	
+	Body   = ''     && If defined, the value is sent in the body of the message.
+	method = [GET]  && It is the http Verb. [POST, GET, DELETE, HEAD, PUT, CONNECT, PATCH]
+	
 	*----------------------------------------------------------------------------*
 	FUNCTION verbose_Assign(tbNewVal)
 	*
 	*----------------------------------------------------------------------------*
-		TRY
-			IF VARTYPE(tbNewVal)#'L' THEN
-				THROW 'Error: solo se puede asignar un valor numerico'
-			ENDIF
-			THIS.Verbose = tbNewVal
-		CATCH TO loEx
-			oTmp = CREATEOBJECT('catchException',THIS.bRelanzarThrow)
-			THIS.oException = loEx
-		ENDTRY
-		
+		IF VARTYPE(tbNewVal)#'L' THEN
+			WAIT WINDOWS 'Error: solo se puede asignar un valor numerico'
+		ENDIF
+		THIS.Verbose = tbNewVal
 	ENDFUNC
-
-	*----------------------------------------------------------------------------*
-	FUNCTION get
-	LPARAMETERS pcURL
 	*
 	*----------------------------------------------------------------------------*
-		*-- Se definen las funciones API necesarias
-		#DEFINE INTERNET_OPEN_TYPE_PRECONFIG     0
-		DECLARE LONG GetLastError IN WIN32API
-		DECLARE INTEGER InternetCloseHandle IN "wininet.dll" ;
-			LONG hInet
-		DECLARE LONG InternetOpen IN "wininet.dll" ;
-			STRING   lpszAgent, ;
-			LONG     dwAccessType, ;
-			STRING   lpszProxyName, ;
-			STRING   lpszProxyBypass, ;
-			LONG     dwFlags
-		DECLARE LONG InternetOpenUrl IN "wininet.dll" ;
-			LONG    hInet, ;
-			STRING  lpszUrl, ;
-			STRING  lpszHeaders, ;
-			LONG    dwHeadersLength, ;
-			LONG    dwFlags, ;
-			LONG    dwContext
-		DECLARE LONG InternetReadFile IN "wininet.dll" ;
-			LONG     hFtpSession, ;
-			STRING  @lpBuffer, ;
-			LONG     dwNumberOfBytesToRead, ;
-			LONG    @lpNumberOfBytesRead
-
-		*-- Se establece la conexión con internet
+	FUNCTION method_Assign(tbNewVal)
+	*
+	*----------------------------------------------------------------------------*
+		lcPossible = [POST, GET, DELETE, HEAD, PUT, CONNECT, PATCH]
+		lcNewVal   = IIF(VARTYPE(tbNewVal)='C', ALLTRIM(tbNewVal), 'GET')
+		
+		THIS.method= IIF(lcNewVal$lcPossible, lcNewVal, 'GET')
+	ENDFUNC
+	*
+	*----------------------------------------------------------------------------*
+	FUNCTION showVerbose
+	LPARAMETERS tcMessage
+	*
+	*----------------------------------------------------------------------------*
 		IF THIS.Verbose
-			WAIT "Opening Internet connection..." WINDOW NOWAIT
+			WAIT tcMessage WINDOW NOWAIT
 		ENDIF
+	ENDFUNC
+	*
+	*----------------------------------------------------------------------------*
+	FUNCTION get
+	LPARAMETERS tcURL
+	*
+	*----------------------------------------------------------------------------*
+		THIS.method = 'GET'
+		RETURN THIS.httpRequest(tcURL)
+	ENDFUNC
+	*
+	*----------------------------------------------------------------------------*
+	FUNCTION post
+	LPARAMETERS tcURL
+	*
+	*----------------------------------------------------------------------------*
+		THIS.method = 'POST'
+		RETURN THIS.httpRequest(tcURL)
+	ENDFUNC
+	*
+	*----------------------------------------------------------------------------*
+	FUNCTION httpRequest
+	LPARAMETERS tcURL
+	*
+	*----------------------------------------------------------------------------*
+		LOCAL lcResponse
+		lcResponse=''
+		
+	    THIS.writelog(' *---------------------------------------------------*')
+		THIS.writelog(' Connected to url: '+tcURL)
+		THIS.writelog(' Body.....: '+THIS.Body)
+		THIS.writelog(' Method...: '+THIS.Method)
 
-		LOCAL nInetHnd
-		nInetHnd = InternetOpen("GETURL",INTERNET_OPEN_TYPE_PRECONFIG,"","",0)
-		IF nInetHnd = 0
-			RETURN ""
-		ENDIF
+		TRY
+			WITH CREATEOBJECT("WinHttp.WinHttpRequest.5.1")
+				*-- Se establece la conexi?n con internet
+				THIS.showVerbose("Opening Internet connection...")
 
-		*-- Se establece la conexión con el recurso
-		IF THIS.Verbose
-			WAIT "Opening connection to URL..." WINDOW NOWAIT
-		ENDIF
+				.open(THIS.method, tcURL, .F.)
+				.Send(THIS.Body)
+				THIS.showVerbose("Opening connection to URL..." )
+		
+				IF .Status = 404 THEN
+					lcResponse = '#'+TRANSFORM(.Status) + ' - ' + .Statustext
+					THROW "No existe la ruta "+ tcURL + lcResponse
+				ENDIF
+				
+				IF !INLIST(.Status, 0, 200) THEN
+					lcResponse = '#'+TRANSFORM(.Status) + ' - ' + .Statustext
+					THROW "Error al desacargar "+ lcResponse 
+				ENDIF
+				
+				IF THIS.is_Text(.GetAllResponseHeaders) THEN	
+					lcResponse = .responseText
+					THIS.writelog(' Response.: '+lcResponse)
+					THIS.showVerbose("Text Format")
+				ELSE
+					lcResponse = .responseBody
+					THIS.writelog(' Response.: una imagen')
+					THIS.showVerbose("Binary Format")
+				ENDIF
+			ENDWITH
+			THIS.showVerbose("It was received from API: "+SUBSTR(lcResponse,1,150))
+			
+		CATCH TO loEx
+			THIS.writelog(' Error: '+loEx.UserValue)
+			THIS.writelog(' URL..: '+tcURL)
+			THIS.showVerbose("Error: "+loEx.UserValue)
+		FINALLY
+		ENDTRY
 
-		LOCAL nURLHnd
-		nURLHnd = InternetOpenUrl(nInetHnd,pcURL,NULL,0,0,0)
-		IF nURLHnd = 0
-			InternetCloseHandle( nInetHnd )
-			RETURN ""
-		ENDIF
-
-		*-- Se lee el contenido del recurso
-		LOCAL cURLData,cBuffer,nBytesReceived,nBufferSize
-		cURLData      =""
-		cBuffer       =""
-		nBytesReceived=0
-		nBufferSize   =0
-
-		DO WHILE .T.
-			*-- Se inicializa el buffer de lectura (bloques de 2 Kb)
-			cBuffer=REPLICATE(CHR(0),2048)
-
-			*-- Se lee el siguiente bloque
-			InternetReadFile(nURLHnd,@cBuffer,LEN(cBuffer),@nBufferSize)
-			IF nBufferSize = 0
+		RETURN lcResponse
+	ENDFUNC	
+	*
+	*----------------------------------------------------------------------------*
+	PROTECTED FUNCTION is_Text
+	LPARAMETERS tcHeader
+	*
+	*----------------------------------------------------------------------------*	
+		LOCAL laType[1], lbSuccess, lcType AS STRING, lnCnt AS NUMBER, lnLoop AS NUMBER
+		lcType = 'text/css,text/csv,application/javascript,application/json,application/xhtml+xml,application/hal+json'
+		lbSuccess = .F.
+		
+		ALINES(laType, lcType, ',')
+		FOR EACH lcValue IN laType
+			IF lcValue $ LOWER(tcHeader) THEN
+				lbSuccess = .T.
 				EXIT
 			ENDIF
+		ENDFOR
 
-			*-- Se acumula el bloque en el buffer de datos
-			cURLData=cURLData + SUBSTR(cBuffer,1,nBufferSize)
-			nBytesReceived=nBytesReceived + nBufferSize
-
-			IF THIS.Verbose
-				WAIT WINDOW ALLTRIM(TRANSFORM(INT(nBytesReceived / 1024),"999,999")) + " Kb received..." NOWAIT
-			ENDIF
-		ENDDO
-		IF THIS.Verbose
-			WAIT CLEAR
-		ENDIF
-
-		*-- Se cierra la conexión a Internet
-		InternetCloseHandle( nInetHnd )
-
-		*-- Se devuelve el contenido del URL
-		RETURN cURLData
+		RETURN lbSuccess
 	ENDFUNC
-	
+	*
+	*----------------------------------------------------------------------------*
+	PROTECTED FUNCTION writelog
+	LPARAMETERS tcLeyenda
+	* 
+	*----------------------------------------------------------------------------*
+		RETURN THIS.is_log AND ;
+			   STRTOFILE(TTOC(DATETIME()) + '| '+tcLeyenda+CHR(13)+CHR(10), 'request.log', 1)>0
+	ENDFUNC
 ENDDEFINE
